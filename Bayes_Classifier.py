@@ -114,7 +114,7 @@ class Bayes_Classifier(object):
         try:
             print "\nClassified with " + str(float(self.classifier.accuracy(data_set)) * 100) + "% accuracy" 
         except ValueError:
-            print "\nTest data not labeled, could not determine accuracy"
+            print "\nTest data not labeled, could not determine accuracy."
 
     def split_60_40(self, data_set):
         ''' Shuffle and split data into training and testing set '''
