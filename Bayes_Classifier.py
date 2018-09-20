@@ -34,10 +34,6 @@ class Bayes_Classifier(object):
     def update_and_train_data(self, new_data):
         ''' Update the classifier with new training data '''
 
-        if not self.classifier:
-            print "No classifier to update"
-            return -1
-
         # Create new classifier with data
         self.classifier = NaiveBayesClassifier(new_data)
         # Set new data
@@ -47,7 +43,7 @@ class Bayes_Classifier(object):
         ''' Add training data to the classifier '''
 
         if not self.classifier or not self.data:
-            print "No classifier to update"
+            print "Error - No data to update."
             return -1
 
         # Get old data
@@ -64,7 +60,7 @@ class Bayes_Classifier(object):
         ''' Saves the classifier '''
 
         if not self.classifier:
-            print "No classifier to save"
+            print "Error - No classifier to save."
             return -1
 
         # Dump to classifier.obj
@@ -85,17 +81,23 @@ class Bayes_Classifier(object):
         ''' Train the model on parsed data '''
 
         if not self.is_trained:
-            self.classifier = NaiveBayesClassifier(data_set)
-            self.is_trained = True
-            self.data = data_set
+            if len(data_set) > 0:
+                self.classifier = NaiveBayesClassifier(data_set)
+                self.is_trained = True
+                self.data = data_set
+                return
+            else:
+                print "Error - Training data set empty."
         else:
-            print "Model already trained"
+            print "Error - Model already trained."
+
+        return -1
 
     def get_model_details(self):
         ''' Get details about a trained model '''
 
         if not self.is_trained:
-            print "Model not trained"
+            print "Error - Model not trained."
             return -1
     
         self.classifier.show_informative_features()
@@ -107,14 +109,30 @@ class Bayes_Classifier(object):
             print "Model not trained"
             return -1
         
-        # Classify each sentence
-        for data in data_set:
-            print '\"' + data[0] + '\"' + " evaluates to " + self.classifier.classify(data)
+        if len(data_set) > 0:
+            if isinstance(data_set[0], tuple):
+                # Classify each sentence from tuple
+                for data in data_set:
+                    print '\"' + data[0] + '\"' + " evaluates to " + self.classifier.classify(data[0]) + "."
+            
+            elif isinstance(data_set[0], str):
+                # Classify each sentence
+                for data in data_set:
+                    print '\"' + data + '\"' + " evaluates to " + self.classifier.classify(data) + "."
 
-        try:
-            print "\nClassified with " + str(float(self.classifier.accuracy(data_set)) * 100) + "% accuracy" 
-        except ValueError:
-            print "\nTest data not labeled, could not determine accuracy."
+            else:
+                # Invalid data format
+                print "Error - Test data not a list of tuples or strings."
+                return -1
+
+            try:
+                print "\nClassified with " + str(float(self.classifier.accuracy(data_set)) * 100) + "% accuracy." 
+            except ValueError:
+                print "\nTest data not labeled. Could not determine accuracy."
+
+        else:
+            print "Error - Test data set is empty."
+            return -1
 
     def split_60_40(self, data_set):
         ''' Shuffle and split data into training and testing set '''
